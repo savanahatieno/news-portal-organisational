@@ -37,4 +37,29 @@ public class App {
         Gson gson = new Gson();
         staticFileLocation("/public");
 
+
+        //Heroku deployment section
+        String connectionString = "jdbc:postgresql://ec2-50-17-21-170.compute-1.amazonaws.com:5432/d8b8ehu0safpui"; //!
+        Sql2o sql2o = new Sql2o(connectionString, "mihpivzxyyqmlv", "5b4f9d76874ad368465a325b3993140263c6d254771908c3d283842d54fcad11");
+
+        sql2oDepartmentsDao=new Sql2oDepartmentsDao(sql2o);
+        sql2oNewsDao=new Sql2oNewsDao(sql2o);
+        sql2oUsersDao=new Sql2oUsersDao(sql2o);
+        conn=sql2o.open();
+
+
+        //GET SECTION FOR THE PATHS
+        get("/users" (request, response) -> {
+
+            if(sql2oDepartmentsDao.getAll().size() > 0){
+                return gson.toJson(sql2oUsersDao.getAll());
+            }
+            else {
+                return "{\"message\":\"I'm sorry, but no users are currently listed in the database.\"}";
+            }
+        });
+
+
+
+
 }

@@ -30,8 +30,12 @@ public class NewsTestDao {
         System.out.println("clearing database");
     }
 
+    public static void setSql2oUsersDao(Sql2oUsersDao sql2oUsersDao) {
+        NewsTestDao.sql2oUsersDao = sql2oUsersDao;
+    }
+
     @Test
-    public void addNews() {
+    public void addNews  () {
         Users users=setUpNewUsers();
         sql2oUsersDao.add(users);
         Departments departments=setUpDepartments();
@@ -60,8 +64,7 @@ public class NewsTestDao {
 //
 //    }
 
-    private Users setUpNewUsers() {
-    }
+
 
 
 //    @Test
@@ -77,9 +80,6 @@ public class NewsTestDao {
 //        sql2oNewsDao.addNews(news);
 //        assertEquals(2,sql2oNewsDao.getAll().size());
 //    }
-
-    private Departments setUpDepartments() {
-    }
 
 
 }

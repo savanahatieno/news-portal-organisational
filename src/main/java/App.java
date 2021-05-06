@@ -1,8 +1,9 @@
 
+import com.google.gson.Gson;
 import dao.Sql2oDepartmentsDao;
 import dao.Sql2oNewsDao;
 import dao.Sql2oUsersDao;
-import exceptions.ApiException;
+import exceptions.*;
 
 import models.Departments;
 import models.News;
@@ -27,6 +28,7 @@ public class App {
         }
         return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
     }
+
     public static void main(String[] args) {
 
         port(getHerokuAssignedPort());
@@ -42,97 +44,85 @@ public class App {
         String connectionString = "jdbc:postgresql://ec2-50-17-21-170.compute-1.amazonaws.com:5432/d8b8ehu0safpui"; //!
         Sql2o sql2o = new Sql2o(connectionString, "mihpivzxyyqmlv", "5b4f9d76874ad368465a325b3993140263c6d254771908c3d283842d54fcad11");
 
-        sql2oDepartmentsDao=new Sql2oDepartmentsDao(sql2o);
-        sql2oNewsDao=new Sql2oNewsDao(sql2o);
-        sql2oUsersDao=new Sql2oUsersDao(sql2o);
-        conn=sql2o.open();
+        sql2oDepartmentsDao = new Sql2oDepartmentsDao(sql2o);
+        sql2oNewsDao = new Sql2oNewsDao(sql2o);
+        sql2oUsersDao = new Sql2oUsersDao(sql2o);
+        conn = sql2o.open();
 
 
         //GET SECTION FOR THE PATHS
-        get("/users" (request, response) -> {
+        get("/users", (request, response) -> {
 
-            if(sql2oDepartmentsDao.getAll().size() > 0){
+            if (sql2oDepartmentsDao.getAll().size() > 0) {
                 return gson.toJson(sql2oUsersDao.getAll());
-            }
-            else {
+            } else {
                 return "{\"message\":\"I'm sorry, but no users are currently listed in the database.\"}";
             }
         });
 
-        get("/departments"(request, response) -> {
-            if(sql2oDepartmentsDao.getAll().size()>0){
+        get("/departments", (request, response) -> {
+            if (sql2oDepartmentsDao.getAll().size() > 0) {
                 return gson.toJson(sql2oDepartmentsDao.getAll());
-            }
-            else {
+            } else {
                 return "{\"message\":\"I'm sorry, but no departments are currently listed in the database.\"}";
             }
         });
-        get("/news/general"(request, response) -> {
-            if(sql2oNewsDao.getAll().size()>0){
+        get("/news/general", (request, response) -> {
+            if (sql2oNewsDao.getAll().size() > 0) {
                 return gson.toJson(sql2oNewsDao.getAll());
-            }
-            else {
+            } else {
                 return "{\"message\":\"I'm sorry, but no news are currently listed in the database.\"}";
             }
         });
-        get("/user/:id/departments"(request, response) -> {
-            int id=Integer.parseInt(request.params("id"));
-            if(sql2oUsersDao.getAllUserDepartments(id).size()>0){
+        get("/users/:id/departments", (request, response) -> {
+            int id = Integer.parseInt(request.params("id"));
+            if (sql2oUsersDao.getAllUserDepartments(id).size() > 0) {
                 return gson.toJson(sql2oUsersDao.getAllUserDepartments(id));
-            }
-            else {
+            } else {
                 return "{\"message\":\"I'm sorry, but user is in no department.\"}";
             }
         });
-        get("/user/:id" (request, response) -> {
-            int id=Integer.parseInt(request.params("id"));
-            if(sql2oUsersDao.findById(id)==null){
+        get("/users/:id", (request, response) -> {
+            int id = Integer.parseInt(request.params("id"));
+            if (sql2oUsersDao.findById(id) == null) {
                 throw new ApiException(404, String.format("No user with the id: \"%s\" exists",
                         request.params("id")));
-            }
-            else {
+            } else {
                 return gson.toJson(sql2oUsersDao.findById(id));
             }
         });
-        get("/department/:id/users"(request, response) -> {
-            int id=Integer.parseInt(request.params("id"));
-            if(sql2oDepartmentsDao.getAllUsersInDepartment(id).size()>0){
+        get("/departments/:id/users", (request, response) -> {
+            int id = Integer.parseInt(request.params("id"));
+            if (sql2oDepartmentsDao.getAllUsersInDepartment(id).size() > 0) {
                 return gson.toJson(sql2oDepartmentsDao.getAllUsersInDepartment(id));
-            }
-            else {
+            } else {
                 return "{\"message\":\"I'm sorry, but department has no users.\"}";
             }
         });
-        get("/department/:id"(request, response) -> {
-            int id=Integer.parseInt(request.params("id"));
-            if(sql2oDepartmentsDao.findById(id)==null){
+        get("/departments/:id", (request, response) -> {
+            int id = Integer.parseInt(request.params("id"));
+            if (sql2oDepartmentsDao.findById(id) == null) {
                 throw new ApiException(404, String.format("No department with the id: \"%s\" exists",
                         request.params("id")));
-            }
-            else {
+            } else {
                 return gson.toJson(sql2oDepartmentsDao.findById(id));
             }
         });
-        get("/news/department/:id"(request, response) -> {
+        get("/news/departments/:id", (request, response) -> {
 
-            int id=Integer.parseInt(request.params("id"));
-            Departments departments=sql2oDepartmentsDao.findById(id);
-            if(departments==null){
+            int id = Integer.parseInt(request.params("id"));
+            Departments departments = sql2oDepartmentsDao.findById(id);
+            if (departments == null) {
                 throw new ApiException(404, String.format("No department with the id: \"%s\" exists",
                         request.params("id")));
             }
-            if(sql2oDepartmentsDao.getDepartmentNews(id).size()>0){
+            if (sql2oDepartmentsDao.getDepartmentNews(id).size() > 0) {
                 return gson.toJson(sql2oDepartmentsDao.getDepartmentNews(id));
-            }
-            else {
+            } else {
                 return "{\"message\":\"I'm sorry, but no news in this department.\"}";
             }
         });
 
 
-
-
-
-
-
     }
+}
